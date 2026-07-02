@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APEX — Guía de Estilo / Design System</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
+
+  <style>
+    /* ============================================================
+       TOKENS — copiados 1:1 de style.css (fuente de verdad)
+    ============================================================ */
+    :root {
+      --color-bg: #0e0b18;
+      --color-primary: #31309b;
+      --color-accent: #5555d2;
+      --color-line: #8080e3;
+      --color-soft: #fda5eb;
+      --color-text: #f2ecdb;
+
+      --color-line-15: rgba(128, 128, 227, 0.15);
+      --color-line-30: rgba(128, 128, 227, 0.3);
+      --color-accent-25: rgba(85, 85, 210, 0.25);
+      --color-primary-40: rgba(49, 48, 155, 0.4);
+      --color-text-60: rgba(242, 236, 219, 0.6);
+      --color-text-40: rgba(242, 236, 219, 0.4);
+
+      --font-display: 'Space Grotesk', 'Arial Narrow', sans-serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+      --container-w: 1200px;
+      --gap: 1.25rem;
+      --radius: 2px;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body, h1, h2, h3, h4, p, ul, dl, dd { margin: 0; }
+    ul { list-style: none; padding: 0; }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    body {
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection { background: var(--color-accent); color: var(--color-text); }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-w);
+      margin-inline: auto;
+      padding-inline: 1.25rem;
+    }
+
+    .blueprint-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(var(--color-line-15) 1px, transparent 1px),
+        linear-gradient(90deg, var(--color-line-15) 1px, transparent 1px);
+      background-size: 36px 36px;
+      -webkit-mask-image: linear-gradient(to bottom, black, transparent 92%);
+      mask-image: linear-gradient(to bottom, black, transparent 92%);
+      opacity: 0.5;
+    }
+
+    /* ============================================================
+       GUÍA — estructura propia (no forma parte del sitio real)
+    ============================================================ */
+    .guide-header {
+      position: relative;
+      z-index: 1;
+      padding: 5rem 0 3.5rem;
+      border-bottom: 1px solid var(--color-line-15);
+      overflow: hidden;
+    }
+
+    .guide-header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top left, var(--color-primary-40), transparent 60%);
+      z-index: -1;
+    }
+
+    .guide-eyebrow {
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.7rem;
+      color: var(--color-soft);
+      margin-bottom: 1rem;
+    }
+
+    .guide-eyebrow::before { content: "// "; color: var(--color-line); }
+
+    .guide-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      max-width: 20ch;
+    }
+
+    .guide-title span { color: var(--color-soft); }
+
+    .guide-sub {
+      margin-top: 1.25rem;
+      color: var(--color-text-60);
+      font-size: 1.05rem;
+      max-width: 56ch;
+    }
+
+    .guide-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+
+    .guide-meta span {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-40);
+      border: 1px solid var(--color-line-30);
+      padding: 0.35rem 0.7rem;
+    }
+
+    .toc {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 0;
+      border-bottom: 1px solid var(--color-line-15);
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      overflow-x: auto;
+    }
+
+    .toc a {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-60);
+      padding: 0.9rem 1rem;
+      white-space: nowrap;
+      border-right: 1px solid var(--color-line-15);
+      transition: color 0.2s var(--ease), background 0.2s var(--ease);
+    }
+
+    .toc a:hover { color: var(--color-soft); background: rgba(255,255,255,0.03); }
+
+    section.block {
+      position: relative;
+      z-index: 1;
+      padding: 4.5rem 0;
+      border-bottom: 1px solid var(--color-line-15);
+    }
+
+    .block__header { max-width: 640px; margin-bottom: 2.5rem; }
+
+    .block__title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(1.6rem, 4vw, 2.25rem);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.75rem;
+    }
+
+    .block__lead { color: var(--color-text-60); font-size: 1rem; max-width: 60ch; }
+
+    .subhead {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-40);
+      margin: 2.5rem 0 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .subhead::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--color-line-15);
+    }
+
+    .subhead:first-child { margin-top: 0; }
+
+    code.tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--color-line);
+      background: rgba(128,128,227,0.08);
+      border: 1px solid var(--color-line-15);
+      padding: 0.15rem 0.4rem;
+    }
+
+    /* ---------- COLOR SWATCHES ---------- */
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .swatch {
+      border: 1px solid var(--color-line-30);
+    }
+
+    .swatch__fill {
+      height: 90px;
+      position: relative;
+      border-bottom: 1px solid var(--color-line-30);
+    }
+
+    .swatch__fill--checker {
+      background-image:
+        linear-gradient(45deg, #222 25%, transparent 25%),
+        linear-gradient(-45deg, #222 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #222 75%),
+        linear-gradient(-45deg, transparent 75%, #222 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+      background-color: #111;
+    }
+
+    .swatch__fill--checker > span { position: absolute; inset: 0; }
+
+    .swatch__meta { padding: 0.85rem 1rem 1rem; }
+
+    .swatch__name {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .swatch__desc {
+      font-size: 0.8rem;
+      color: var(--color-text-60);
+      margin-bottom: 0.6rem;
+    }
+
+    .swatch__hex {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-soft);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .swatch__var { color: var(--color-text-40); }
+
+    /* ---------- TYPE SPECIMENS ---------- */
+    .type-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--color-line-15);
+    }
+    .type-row:last-child { border-bottom: none; }
+
+    .type-row__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--color-text-40);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .type-row__meta b { color: var(--color-line); font-weight: 500; }
+
+    .type-display-xl { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.1rem, 8vw, 4rem); line-height: 1.05; letter-spacing: -0.01em; }
+    .type-display-lg { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.75rem, 5vw, 2.75rem); line-height: 1.15; letter-spacing: -0.01em; }
+    .type-display-md { font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; }
+    .type-display-num { font-family: var(--font-mono); font-weight: 600; font-size: clamp(2.5rem, 6vw, 4rem); color: var(--color-soft); }
+    .type-body-lg { font-family: var(--font-body); font-weight: 400; font-size: 1.05rem; color: var(--color-text-60); }
+    .type-body-md { font-family: var(--font-body); font-weight: 400; font-size: 0.92rem; }
+    .type-mono-label { font-family: var(--font-mono); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .type-eyebrow { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.7rem; color: var(--color-soft); }
+    .type-eyebrow::before { content: "// "; color: var(--color-line); }
+    .type-coord { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.05em; color: var(--color-text-40); }
+
+    /* ---------- BUTTONS (copiados) ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.95rem 1.6rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s var(--ease);
+      white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn--primary { background: var(--color-primary); color: var(--color-text); border-color: var(--color-accent); }
+    .btn--primary:hover { background: var(--color-accent); }
+    .btn--ghost { background: transparent; color: var(--color-text); border-color: var(--color-line-30); }
+    .btn--ghost:hover { border-color: var(--color-soft); color: var(--color-soft); }
+    .btn--small { padding: 0.6rem 1.1rem; font-size: 0.75rem; }
+    .btn--laser { position: relative; overflow: hidden; }
+    .btn--laser::after {
+      content: "";
+      position: absolute; top: 0; left: -60%;
+      width: 40%; height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(242, 236, 219, 0.55), transparent);
+      transform: skewX(-20deg);
+      transition: left 0.6s var(--ease);
+    }
+    .btn--laser:hover::after { left: 120%; }
+    .btn--disabled { opacity: 0.35; pointer-events: none; }
+
+    .demo-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+
+    /* ---------- CARDS ---------- */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+
+    .plan-card {
+      border: 1px solid var(--color-line-30);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .plan-card__code { font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-40); margin-bottom: 0.75rem; }
+    .plan-card h3 { font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 0.4rem; }
+    .plan-card__desc { color: var(--color-text-60); font-size: 0.9rem; margin-bottom: 1.25rem; }
+    .plan-card__price { font-family: var(--font-mono); font-size: 1.7rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .plan-card__price span { font-size: 0.7rem; font-weight: 400; color: var(--color-text-40); text-transform: uppercase; }
+    .plan-card--featured { border-color: var(--color-soft); background: rgba(85, 85, 210, 0.1); }
+    .plan-card__badge {
+      position: absolute; top: -0.7rem; left: 1.75rem;
+      background: var(--color-soft); color: var(--color-bg);
+      font-family: var(--font-mono); font-size: 0.65rem;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 0.25rem 0.6rem;
+    }
+
+    .beneficios__card {
+      border: 1px solid var(--color-line-15);
+      padding: 1.75rem 1.5rem;
+      position: relative;
+      background: rgba(255,255,255,0.015);
+      transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
+    }
+    .beneficios__card:hover { transform: translateY(-4px); border-color: var(--color-line-30); box-shadow: 0 12px 30px rgba(0,0,0,0.35); }
+    .beneficios__icon-wrap { width: 44px; height: 44px; margin-bottom: 1.1rem; display: flex; align-items: center; justify-content: center; }
+    .beneficios__icon-wrap img { width: 100%; height: 100%; object-fit: contain; }
+    .beneficios__card-title { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; margin-bottom: 0.5rem; }
+    .beneficios__card-text { font-size: 0.88rem; color: var(--color-text-60); }
+
+    .result-card {
+      border: 1px solid var(--color-line-30);
+      padding: 1.25rem;
+      min-width: 180px;
+      background: rgba(0,0,0,0.3);
+    }
+    .result-card__delta { font-family: var(--font-mono); font-size: 1.4rem; font-weight: 600; color: var(--color-soft); }
+    .result-card__name { font-size: 0.8rem; color: var(--color-text-60); margin-top: 0.4rem; }
+
+    /* ---------- BADGES / TAGS ---------- */
+    .badge-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .badge {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.3rem 0.65rem;
+      border: 1px solid var(--color-line-30);
+    }
+    .badge--soft { background: var(--color-soft); color: var(--color-bg); border-color: var(--color-soft); }
+    .badge--live { color: var(--color-soft); border-color: var(--color-soft); display: inline-flex; align-items: center; gap: 0.4rem; }
+    .badge--live .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-soft); animation: pulse-dot 1.6s infinite; }
+    .badge--outline { color: var(--color-text-60); }
+    @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ---------- FORM ---------- */
+    .form-demo {
+      border: 1px solid var(--color-line-30);
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+      max-width: 480px;
+    }
+    .form-row { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-row--split { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-row label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-40); }
+    .form-row input, .form-row select, .form-row textarea {
+      border: 1px solid var(--color-line-30);
+      background: rgba(255,255,255,0.02);
+      padding: 0.75rem 0.85rem;
+      font-size: 0.92rem;
+      color: var(--color-text);
+      font-family: var(--font-body);
+      transition: border-color 0.2s var(--ease);
+      width: 100%;
+    }
+    .form-row input::placeholder, .form-row textarea::placeholder { color: var(--color-text-40); }
+    .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--color-soft); outline: none; }
+    .form-row select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f2ecdb' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.8rem center;
+      background-size: 16px;
+      padding-right: 2.5rem;
+    }
+
+    /* ---------- ICON WRAPS / HUD ---------- */
+    .hud-demo {
+      position: relative;
+      height: 160px;
+      border: 1px dashed var(--color-line-15);
+    }
+    .hud-corner { position: absolute; width: 22px; height: 22px; border: 1px solid var(--color-line-30); }
+    .hud-corner--tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+    .hud-corner--tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+    .hud-corner--bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+    .hud-corner--br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+    /* ---------- SPACING SCALE ---------- */
+    .space-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; }
+    .space-bar { background: var(--color-accent); height: 14px; }
+    .space-label { font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-60); width: 140px; flex-shrink: 0; }
+
+    /* ---------- CHART DEMO ---------- */
+    .chart-demo { border: 1px solid var(--color-line-30); padding: 1.5rem; background: rgba(0,0,0,0.3); }
+    .channel__label { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; color: var(--color-text-60); margin-bottom: 0.4rem; }
+    .channel__value { color: var(--color-soft); font-weight: 600; }
+    .channel { margin-bottom: 1.25rem; }
+    .chart-grid line { stroke: var(--color-line-15); stroke-width: 1; }
+    .chart-path { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .chart-path--brake { stroke: var(--color-soft); }
+    .chart-path--throttle { stroke: var(--color-accent); }
+    .chart-path--steering { stroke: var(--color-line); }
+
+    /* ---------- MOTION DEMO ---------- */
+    .motion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; }
+    .motion-card { border: 1px solid var(--color-line-15); padding: 1.5rem; text-align: center; }
+    .motion-card__label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-40); margin-top: 1rem; }
+    .motion-box { width: 60px; height: 60px; background: var(--color-primary); border: 1px solid var(--color-accent); margin: 0 auto; }
+    .motion-box--float { animation: float-demo 2.4s ease-in-out infinite; }
+    @keyframes float-demo { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .motion-box--reveal { opacity: 0.15; animation: reveal-demo 1.8s var(--ease) infinite; }
+    @keyframes reveal-demo { 0% { opacity: 0.15; transform: translateY(16px);} 50% { opacity: 1; transform: translateY(0);} 100% { opacity: 0.15; transform: translateY(16px);} }
+    .motion-box--pulse { animation: pulse-demo 1.6s ease-in-out infinite; }
+    @keyframes pulse-demo { 0%,100% { box-shadow: 0 0 0 0 var(--color-primary-40);} 50% { box-shadow: 0 0 0 10px transparent;} }
+
+    /* ---------- CODE BLOCK ---------- */
+    .code-block {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--color-line-15);
+      padding: 1.25rem;
+      overflow-x: auto;
+      color: var(--color-text-60);
+      line-height: 1.7;
+    }
+    .code-block .k { color: var(--color-line); }
+    .code-block .v { color: var(--color-soft); }
+
+    .footer-note {
+      position: relative;
+      z-index: 1;
+      padding: 3rem 0 5rem;
+      text-align: center;
+    }
+    .footer-note p { font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-40); }
+
+    @media (min-width: 768px) {
+      .swatch-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="blueprint-grid" aria-hidden="true"></div>
+
+  <!-- ================= HEADER ================= -->
+  <header class="guide-header">
+    <div class="container">
+      <p class="guide-eyebrow">Design System v1.0</p>
+      <h1 class="guide-title">APEX — Guía de <span>UI &amp; Estilo</span></h1>
+      <p class="guide-sub">
+        Referencia completa de la identidad visual de Apex: paleta, tipografía, componentes, efectos y
+        principios de layout, extraídos directamente de <code class="tag">style.css</code>.
+      </p>
+      <div class="guide-meta">
+        <span>Estética: Blueprint / HUD técnico</span>
+        <span>Base: Mobile-first</span>
+        <span>Radios: casi nulos (2px)</span>
+        <span>3 familias tipográficas</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= TOC ================= -->
+  <nav class="toc" aria-label="Índice">
+    <a href="#colores">Colores</a>
+    <a href="#tipografia">Tipografía</a>
+    <a href="#botones">Botones</a>
+    <a href="#badges">Badges</a>
+    <a href="#tarjetas">Tarjetas</a>
+    <a href="#formularios">Formularios</a>
+    <a href="#hud">HUD &amp; Blueprint</a>
+    <a href="#movimiento">Movimiento</a>
+  </nav>
+
+  <main>
+
+    <!-- ================= COLORES ================= -->
+    <section class="block" id="colores">
+      <div class="container">
+        <div class="block__header">
+          <p class="type-eyebrow">01 — Paleta</p>
+          <h2 class="block__title">Colores</h2>
+          <p class="block__lead">Paleta estricta y acotada: un fondo casi negro, azules eléctricos como base de marca
+            y un rosa/magenta suave reservado para acentos y estados activos.</p>
+        </div>
+
+        <p class="subhead">Colores base</p>
+        <div class="swatch-grid">
+          <div class="swatch">
+            <div class="swatch__fill" style="background:#0e0b18;"></div>
+            <div class="swatch__meta">
+              <div class="swatch__name">Background</div>
+              <div class="swatch__desc">Fondo principal, negro azulado</div>
+              <div class="swatch__hex"><span>#0e0b18</span><span class="swatch__var">--color-bg</span></div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch__fill" style="background:#31309b;"></div>
+            <div class="swatch__meta">
+              <div class="swatch__name">Primary</div>
+              <div class="swatch__desc">Azul eléctrico, botones y fondos de sección</div>
+              <div class="swatch__hex"><span>#31309b</span><span class="swatch__var">--color-primary</span></div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch__fill" style="background:#5555d2;"></div>
+            <div class="swatch__meta">
+              <div class="swatch__name">Accent</div>
+              <div class="swatch__desc">Azul de acento, hover de primario</div>
+              <div class="swatch__hex"><span>#5555d2</span><span class="swatch__var">--color-accent</span></div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch__fill" style="background:#8080e3;"></div>
+            <div class="swatch__meta">
+              <div class="swatch__name">Line</div>
+              <div class="swatch__desc">Líneas, grillas y bordes tipo blueprint</div>
+              <div class="swatch__hex"><span>#8080e3</span><span class="swatch__var">--color-line</span></div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch__fill" style="background:#fda5eb;"></div>
+            <div class="swatch__meta">
+              <div class="swatch__name">Soft</div>
+              <div class="swatch__desc">Rosa suave — acento puntual, focus, live</div>
+              <div class="swatch__hex"><span>#fda5eb</span><span class="swatch__var">--color-soft</span></div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch__fill" style="background:#f2ecdb;"></div>
+            <div class="swatch__meta">
+              <div class="swatch__name">Text</div>
+              <div class="swatch__desc">Texto principal, hueso claro</div>
+              <div class="swatch__hex"><span>#f2ecdb</span><span class="swatch__var">--color-text</span></div>
+            </div>
+          </div>
+        </div>
+
+        <p class="subhead">Variantes con transparencia</p>
+        <div class="swatch-grid">
+          <div class="swatch">
+            <div class="swatch__fill swatch__fill--checker"><span style="background:rgba(128,128,227,0.15);"></span></div>
+            <div class="swatch__meta">
+              <div class="swatch__name">Line 15%</div>
+              <div class="swatch__hex"><span>rgba(128,128,227,.15)</span></div>
+              <div class="swatch__hex"><span class="swatch__var">--color-line-15</span></div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch__fill swatch__fill--checker"><span style="background:rgba(128,128,227,0.3);"></span></div>
+            <div class="swatch__meta">
+              <div class="swatch__name">Line 30%</div>
+              <div class="swatch__hex"><span>rgba(128,128,227,.3)</span></div>
+              <div class="swatch__hex"><span class="swatch__var">--color-line-30</span></div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch__fill swatch__fill--checker"><span style="background:rgba(85,85,210,0.25);"></span></div>
+            <div class="swatch__meta">
+              <div class="swatch__name">Accent 25%</div>
+              <div class="swatch__hex"><span>rgba(85,85,210,.25)</span></div>
+              <div class="swatch__hex"><span class="swatch__var">--color-accent-25</span></div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch__fill swatch__fill--checker"><span style="background:rgba(49,48,155,0.4);"></span></div>
+            <div class="swatch__meta">
+              <div class="swatch__name">Primary 40%</div>
+              <div class="swatch__hex"><span>rgba(49,48,155,.4)</span></div>
+              <div class="swatch__hex"><span class="swatch__var">--color-primary-40</span></div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch__fill swatch__fill--checker"><span style="background:rgba(242,236,219,0.6);"></span></div>
+            <div class="swatch__meta">
+              <div class="swatch__name">Text 60%</div>
+              <div class="swatch__hex"><span>rgba(242,236,219,.6)</span></div>
+              <div class="swatch__hex"><span class="swatch__var">--color-text-60</span></div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch__fill swatch__fill--checker"><span style="background:rgba(242,236,219,0.4);"></span></div>
+            <div class="swatch__meta">
+              <div class="swatch__name">Text 40%</div>
+              <div class="swatch__hex"><span>rgba(242,236,219,.4)</span></div>
+              <div class="swatch__hex"><span class="swatch__var">--color-text-40</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TIPOGRAFÍA ================= -->
+    <section class="block" id="tipografia">
+      <div class="container">
+        <div class="block__header">
+          <p class="type-eyebrow">02 — Type System</p>
+          <h2 class="block__title">Tipografía</h2>
+          <p class="block__lead">Tres familias con roles bien definidos: Space Grotesk para títulos técnicos y
+            geométricos, Inter para texto de lectura, y JetBrains Mono para datos, etiquetas y telemetría estilo
+            HUD.</p>
+        </div>
+
+        <p class="subhead">Space Grotesk — Display</p>
+        <div class="type-row">
+          <div class="type-row__meta"><b>Hero Title</b> · 700 · clamp(2.1rem, 8vw, 4rem) · line-height 1.05</div>
+          <div class="type-display-xl">Dejá de jugar.</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>Section Title</b> · 600 · clamp(1.75rem, 5vw, 2.75rem) · line-height 1.15</div>
+          <div class="type-display-lg">¿Por qué entrenar con nosotros?</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>Card / Component Title</b> · 600 · 1.3rem</div>
+          <div class="type-display-md">Plan Rookie</div>
+        </div>
+
+        <p class="subhead">JetBrains Mono — Datos &amp; UI técnica</p>
+        <div class="type-row">
+          <div class="type-row__meta"><b>Número destacado</b> · 600 · clamp(2.5rem, 6vw, 4rem)</div>
+          <div class="type-display-num">-0.842s</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>Eyebrow</b> · uppercase · letter-spacing .14em · 0.7rem · prefijo "// "</div>
+          <div class="type-eyebrow">Telemetría</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>Label / Botón</b> · uppercase · letter-spacing .06em · 0.85rem</div>
+          <div class="type-mono-label">Aplicá a la academia</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>Coordenada decorativa</b> · 0.65rem · letter-spacing .05em · color text-40</div>
+          <div class="type-coord">LAT 41.5700° N / LONG 5.9706° E</div>
+        </div>
+
+        <p class="subhead">Inter — Cuerpo de texto</p>
+        <div class="type-row">
+          <div class="type-row__meta"><b>Lead / Subtítulo</b> · 400 · 1.05rem · color text-60</div>
+          <div class="type-body-lg">Entrená con telemetría de nivel profesional y un sistema de datos diseñado
+            para borrar décimas — no para pasar el rato.</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>Body</b> · 400 · 0.92rem</div>
+          <div class="type-body-md">Texto de párrafo estándar, usado en descripciones de tarjetas, formularios y
+            contenido general del sitio.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= BOTONES ================= -->
+    <section class="block" id="botones">
+      <div class="container">
+        <div class="block__header">
+          <p class="type-eyebrow">03 — Componentes</p>
+          <h2 class="block__title">Botones</h2>
+          <p class="block__lead">Siempre en mayúsculas, tipografía mono, radios casi nulos. El primario sube 2px al
+            hacer hover; la variante "laser" agrega un barrido de luz diagonal.</p>
+        </div>
+
+        <p class="subhead">Variantes</p>
+        <div class="demo-row">
+          <a href="#" class="btn btn--primary">Primario</a>
+          <a href="#" class="btn btn--primary btn--laser"><span>Primario + Láser (hover)</span></a>
+          <a href="#" class="btn btn--ghost">Ghost</a>
+          <a href="#" class="btn btn--primary btn--small">Chico</a>
+          <a href="#" class="btn btn--primary btn--disabled">Disabled</a>
+        </div>
+
+        <p class="subhead">Especificación</p>
+        <div class="code-block">
+<span class="k">font-family</span>: var(--font-mono);<br>
+<span class="k">font-size</span>: 0.85rem; <span class="k">text-transform</span>: uppercase; <span class="k">letter-spacing</span>: 0.06em;<br>
+<span class="k">padding</span>: 0.95rem 1.6rem; <span class="k">border-radius</span>: var(--radius) /* 2px */<br>
+<span class="k">transition</span>: transform .25s, background .25s, border-color .25s;<br>
+<span class="k">hover</span> → transform: translateY(-2px);
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= BADGES ================= -->
+    <section class="block" id="badges">
+      <div class="container">
+        <div class="block__header">
+          <p class="type-eyebrow">04 — Componentes</p>
+          <h2 class="block__title">Badges &amp; Tags</h2>
+          <p class="block__lead">Etiquetas pequeñas en mono uppercase, usadas para destacar planes, estados en vivo
+            o metadatos.</p>
+        </div>
+        <div class="badge-row">
+          <span class="badge badge--soft">Más elegido</span>
+          <span class="badge badge--live"><span class="dot"></span> Live</span>
+          <span class="badge badge--outline">Beta</span>
+          <span class="badge badge--outline">Rev.01</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TARJETAS ================= -->
+    <section class="block" id="tarjetas">
+      <div class="container">
+        <div class="block__header">
+          <p class="type-eyebrow">05 — Componentes</p>
+          <h2 class="block__title">Tarjetas</h2>
+          <p class="block__lead">Bordes finos en vez de sombras marcadas; el estado "featured" se resuelve con un
+            borde en color soft y un fondo tintado, no con elevación.</p>
+        </div>
+
+        <p class="subhead">Planes</p>
+        <div class="card-grid">
+          <div class="plan-card">
+            <div class="plan-card__code">// 01 — ROOKIE</div>
+            <h3>Plan Rookie</h3>
+            <p class="plan-card__desc">Ideal para empezar a entender tu telemetría básica.</p>
+            <div class="plan-card__price">$29 <span>/ mes</span></div>
+            <a href="#" class="btn btn--ghost btn--small btn--full">Elegir plan</a>
+          </div>
+          <div class="plan-card plan-card--featured">
+            <span class="plan-card__badge">Más elegido</span>
+            <div class="plan-card__code">// 02 — PRO</div>
+            <h3>Plan Pro</h3>
+            <p class="plan-card__desc">Análisis completo, sesiones 1 a 1 con instructor.</p>
+            <div class="plan-card__price">$79 <span>/ mes</span></div>
+            <a href="#" class="btn btn--primary btn--small btn--full">Elegir plan</a>
+          </div>
+          <div class="plan-card">
+            <div class="plan-card__code">// 03 — ELITE</div>
+            <h3>Plan Elite</h3>
+            <p class="plan-card__desc">Acceso ilimitado y revisión semanal de datos.</p>
+            <div class="plan-card__price">$149 <span>/ mes</span></div>
+            <a href="#" class="btn btn--ghost btn--small btn--full">Elegir plan</a>
+          </div>
+        </div>
+
+        <p class="subhead">Beneficio (hover activo)</p>
+        <div class="card-grid">
+          <div class="beneficios__card">
+            <div class="beneficios__icon-wrap">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fda5eb" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            </div>
+            <h3 class="beneficios__card-title">Mejorá tus tiempos</h3>
+            <p class="beneficios__card-text">Aprendé técnicas de conducción para reducir segundos por vuelta.</p>
+          </div>
+          <div class="beneficios__card">
+            <div class="beneficios__icon-wrap">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fda5eb" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="M4 10h16M10 4v16"/></svg>
+            </div>
+            <h3 class="beneficios__card-title">Entrenamiento personalizado</h3>
+            <p class="beneficios__card-text">Recibí recomendaciones enfocadas en tus necesidades.</p>
+          </div>
+        </div>
+
+        <p class="subhead">Resultado (delta)</p>
+        <div class="demo-row">
+          <div class="result-card">
+            <div class="result-card__delta">-0.842s</div>
+            <div class="result-card__name">Sector 2 — Spa</div>
+          </div>
+          <div class="result-card">
+            <div class="result-card__delta">-1.204s</div>
+            <div class="result-card__name">Vuelta completa</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FORMULARIOS ================= -->
+    <section class="block" id="formularios">
+      <div class="container">
+        <div class="block__header">
+          <p class="type-eyebrow">06 — Componentes</p>
+          <h2 class="block__title">Formularios</h2>
+          <p class="block__lead">Campos transparentes con borde sutil; el foco se marca con el color soft, sin
+            glow ni sombra.</p>
+        </div>
+        <form class="form-demo" onsubmit="return false;">
+          <div class="form-row form-row--split">
+            <div class="form-row">
+              <label for="g-name">Nombre</label>
+              <input id="g-name" type="text" placeholder="Tu nombre">
+            </div>
+            <div class="form-row">
+              <label for="g-email">Email</label>
+              <input id="g-email" type="email" placeholder="vos@email.com">
+            </div>
+          </div>
+          <div class="form-row">
+            <label for="g-select">Simulador</label>
+            <select id="g-select">
+              <option>iRacing</option>
+              <option>ACC</option>
+              <option>rFactor 2</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="g-msg">Mensaje</label>
+            <textarea id="g-msg" rows="3" placeholder="Contanos tu objetivo..."></textarea>
+          </div>
+          <button class="btn btn--primary btn--full" type="submit">Enviar aplicación</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= HUD ================= -->
+    <section class="block" id="hud">
+      <div class="container">
+        <div class="block__header">
+          <p class="type-eyebrow">07 — Motivos decorativos</p>
+          <h2 class="block__title">HUD &amp; Blueprint</h2>
+          <p class="block__lead">Marco de esquinas fijo y grilla de fondo tipo plano técnico: refuerzan la
+            estética de "panel de carrera" en toda la página.</p>
+        </div>
+
+        <p class="subhead">Esquinas HUD</p>
+        <div class="hud-demo">
+          <span class="hud-corner hud-corner--tl"></span>
+          <span class="hud-corner hud-corner--tr"></span>
+          <span class="hud-corner hud-corner--bl"></span>
+          <span class="hud-corner hud-corner--br"></span>
+          <span class="type-coord" style="position:absolute; top:1rem; left:1rem;">LAT 41.5700° N</span>
+          <span class="type-coord" style="position:absolute; bottom:1rem; right:1rem;">APX-DOC // REV.01</span>
+        </div>
+
+        <p class="subhead">Grilla blueprint (2 densidades)</p>
+        <div class="demo-row" style="gap:1.5rem;">
+          <div style="width:100%; height:120px; position:relative; border:1px solid var(--color-line-15); overflow:hidden;">
+            <div style="position:absolute; inset:0; background-image:linear-gradient(var(--color-line-15) 1px, transparent 1px), linear-gradient(90deg, var(--color-line-15) 1px, transparent 1px); background-size:36px 36px; opacity:.6;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= MOVIMIENTO ================= -->
+    <section class="block" id="movimiento" style="border-bottom:none;">
+      <div class="container">
+        <div class="block__header">
+          <p class="type-eyebrow">08 — Motion</p>
+          <h2 class="block__title">Movimiento &amp; Efectos</h2>
+          <p class="block__lead">Easing consistente <code class="tag">cubic-bezier(0.16, 1, 0.3, 1)</code> en todo
+            el sitio. Reveals al hacer scroll, pulso en indicadores "live" y barridos de luz en CTAs.</p>
+        </div>
+
+        <div class="motion-grid">
+          <div class="motion-card">
+            <div class="motion-box motion-box--float"></div>
+            <p class="motion-card__label">Float (scroll cue)</p>
+          </div>
+          <div class="motion-card">
+            <div class="motion-box motion-box--reveal"></div>
+            <p class="motion-card__label">Reveal on scroll</p>
+          </div>
+          <div class="motion-card">
+            <div class="motion-box motion-box--pulse"></div>
+            <p class="motion-card__label">Pulse dot (live)</p>
+          </div>
+          <div class="motion-card">
+            <a href="#" class="btn btn--primary btn--laser" style="margin-top:0.5rem;"><span>Hover acá</span></a>
+            <p class="motion-card__label">Laser sweep</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer-note">
+    <p>APEX // Design System — generado a partir de style.css · Rev.01</p>
+  </footer>
+
+  <script>
+    if (window.lucide) lucide.createIcons();
+  </script>
+</body>
+
+</html>
